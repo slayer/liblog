@@ -3,7 +3,7 @@
  *
  *       Filename:  log.c
  *
- *    Description:  debug stuff
+ *    Description:  logging stuff
  *
  *        Version:  1.0
  *        Created:  13.09.2007 16:37:34 EEST
@@ -27,7 +27,7 @@
 #include <stdarg.h>
 #include <errno.h>
 
-#include "debug.h"
+#include "log.h"
 
 
 #ifdef LIBLOG_DEBUG

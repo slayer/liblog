@@ -3,7 +3,7 @@
  * 
  *       Filename:  log.h
  * 
- *    Description:  debug stuff
+ *    Description:  logging stuff
  * 
  *        Version:  1.0
  *        Created:  13.09.2007 16:31:31 EEST
