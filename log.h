@@ -15,7 +15,7 @@
  * =====================================================================================
  */
 
-#ifdef LIBLOG_DEBUG
+#ifdef LIBLOG_ENABLED
 
 #include <errno.h>
 
@@ -39,11 +39,13 @@ void liblog_verify_perror(const char* file, int line, const char* func, int erro
 const char* liblog_get_debug_prefix(const char *prefix, const char* file, int line, const char* func);
 void liblog_fenter_args(const char* file, int line, const char* func, const char* fmt, ...);
 void liblog_fleave_args(const char* file, int line, const char* func, const char* fmt, ...);
-void liblog_dbg_done();
+void liblog_set_file(FILE*f);
+void liblog_done();
 
 
-#define DBG_INIT				((void) 0)
-#define DBG_DONE				liblog_dbg_done()
+#define LOG_INIT				((void) 0)
+#define LOG_SET_FILE(f)			(liblog_set_file(f))
+#define LOG_DONE				liblog_done()
 #define RESET_ERRNO				(((errno)=(0)))
 #ifndef _WIN32
 #define ASSERT(expr)			((void)((expr) ? (0) : (liblog_assert(__FILE__, __LINE__, __FUNCTION__, "Expression: '"#expr"'"))))
@@ -63,8 +65,9 @@ void liblog_dbg_done();
 
 #else
 
-#define DBG_INIT				((void) 0)
-#define DBG_DONE				((void) 0)
+#define LOG_INIT				((void) 0)
+#define LOG_DONE				((void) 0)
+#define LOG_SET_FILE(f)			((void) 0)
 #define RESET_ERRNO				((void) (0))
 #ifndef _WIN32
 #define ASSERT(expr)			((void) (0))

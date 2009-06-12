@@ -30,7 +30,7 @@
 #include "log.h"
 
 
-#ifdef LIBLOG_DEBUG
+#ifdef LIBLOG_ENABLED
 
 #define _CRT_SECURE_NO_DEPRECATE 1
 
@@ -44,6 +44,11 @@ char debug_prefix_buf[1024];
 int  debug_indent=0;
 char debug_indent_buf[1024];
 FILE *log_file = NULL;
+
+void liblog_set_file(FILE* file)
+{
+	log_file = file;
+}
 
 /* Return prefix string for indention */
 const char *liblog_get_indent() {
@@ -75,7 +80,7 @@ void liblog_puts(const char * str)
 	}
 };
 
-void liblog_dbg_done()
+void liblog_done()
 {
 #ifndef LIBLOG_LOG_STDFILE
 	fclose(log_file);
