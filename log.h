@@ -33,6 +33,7 @@ void liblog_fenter_args(const char* file, int line, const char* func, const char
 void liblog_fleave_args(const char* file, int line, const char* func, const char* fmt, ...);
 void liblog_set_file(FILE*f);
 void liblog_first_line();
+void liblog_hexdump(const char* str, unsigned char *data, int bytes);
 void liblog_done();
 
 
@@ -88,7 +89,8 @@ void liblog_done();
 
 #else
 
-#define LOG_INIT				((void) 0)
+void liblog_none(const char* str, ...);
+#define LOG_INIT(str)				(liblog_none(str))
 #define LOG_DONE				((void) 0)
 #define LOG_SET_FILE(f)			((void) 0)
 #define RESET_ERRNO				((void) (0))

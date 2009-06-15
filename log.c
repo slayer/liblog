@@ -282,7 +282,7 @@ void liblog_hexdump(const char* str, unsigned char *data, int bytes)
 
 
 #else
-void liblog_none(const char* str, ...) { return; }
+void liblog_none(const char* str, ...) { if(0 && str) return; }
 
 #endif
 
