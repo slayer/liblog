@@ -19,15 +19,7 @@
 
 #include <errno.h>
 
-#ifndef LIBLOG_LOG_STDFILE
-// #define LIBLOG_LOG_STDFILE stderr  // Uncomment it to use STDERR
-// #define LIBLOG_LOG_STDFILE stdout  // Uncomment it to use STDOUT
-#endif
-
-#ifndef LIBLOG_LOG_FILE
-#define LIBLOG_LOG_FILE "/dev/console"
-#endif
-
+void liblog_init(const char *filename);
 void liblog_print(const char* prefix, const char* str, ...);
 void liblog_fenter(const char* file, int line, const char* func);
 void liblog_fleave(const char* file, int line, const char* func);
@@ -40,10 +32,11 @@ const char* liblog_get_debug_prefix(const char *prefix, const char* file, int li
 void liblog_fenter_args(const char* file, int line, const char* func, const char* fmt, ...);
 void liblog_fleave_args(const char* file, int line, const char* func, const char* fmt, ...);
 void liblog_set_file(FILE*f);
+void liblog_first_line();
 void liblog_done();
 
 
-#define LOG_INIT				((void) 0)
+#define LOG_INIT(filename)		(liblog_init(filename))
 #define LOG_SET_FILE(f)			(liblog_set_file(f))
 #define LOG_DONE				liblog_done()
 #define RESET_ERRNO				(((errno)=(0)))
@@ -53,10 +46,10 @@ void liblog_done();
 #endif
 #define ASSERT_PERROR			((void)((!(errno)) ? (0) : (liblog_assert_perror(__FILE__, __LINE__, __FUNCTION__, errno))));RESET_ERRNO
 #define VERIFY_PERROR			((void)((!(errno)) ? (0) : (liblog_assert_perror(__FILE__, __LINE__, __FUNCTION__, errno))))
-#define FENTER					(liblog_fenter(__FILE__, __LINE__, __FUNCTION__));RESET_ERRNO
-#define FENTERA(fmt, ...)		(liblog_fenter_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));RESET_ERRNO
-#define FLEAVE					(liblog_fleave(__FILE__, __LINE__, __FUNCTION__));RESET_ERRNO
-#define FLEAVEA(fmt, ...)		(liblog_fleave_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));RESET_ERRNO
+#define FENTER					(liblog_fenter(__FILE__, __LINE__, __FUNCTION__));
+#define FENTERA(fmt, ...)		(liblog_fenter_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));
+#define FLEAVE					(liblog_fleave(__FILE__, __LINE__, __FUNCTION__));
+#define FLEAVEA(fmt, ...)		(liblog_fleave_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));
 #define DBG(str, ...)			(liblog_print(((const char*) liblog_get_debug_prefix("| DEBUG:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__));
 #define WARN(str, ...)			{ liblog_print("", "\n\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");\
 		liblog_print(((const char*) liblog_get_debug_prefix("WARNING:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);\

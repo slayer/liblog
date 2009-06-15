@@ -26,6 +26,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 #include "log.h"
 
@@ -44,6 +48,23 @@ char debug_prefix_buf[1024];
 int  debug_indent=0;
 char debug_indent_buf[1024];
 FILE *log_file = NULL;
+
+void liblog_init(const char *filename)
+{
+	FILE *file;
+	if (filename) {
+		file = fopen(filename, "a+");
+		if (file) {
+#if 0
+			fprintf(stderr, "opened '%s'\n", filename);
+#endif
+			liblog_set_file(file);
+			liblog_first_line();
+		} else
+			fprintf(stderr, "failed to open '%s'\n", filename);
+	} else 
+		liblog_set_file(stderr);
+}
 
 void liblog_set_file(FILE* file)
 {
@@ -65,26 +86,14 @@ const char *liblog_get_indent() {
 /* Print out stub */
 void liblog_puts(const char * str) 
 {
-	if ( !log_file ) {
-#ifdef LIBLOG_LOG_STDFILE
-		log_file = LIBLOG_LOG_STDFILE;
-#else
-		if ( ! (log_file = fopen(LIBLOG_LOG_FILE, "w")) ) {
-			char buf[512];
-			snprintf(buf, sizeof(buf), "Cannot open %s for writting", LIBLOG_LOG_FILE);
-			perror(buf);
-		};
-#endif
-	} else {
-		fputs(str, log_file);
-	}
+	fputs(str, log_file);
+	fflush(log_file);
 };
 
 void liblog_done()
 {
-#ifndef LIBLOG_LOG_STDFILE
+	liblog_print("DONE", "Close log file");	
 	fclose(log_file);
-#endif
 }
 
 void liblog_first_line()
@@ -152,7 +161,7 @@ const char* liblog_get_debug_prefix(const char *prefix, const char* file, int li
 	return debug_prefix_buf; 
 };
 
-void liblog_none(const char* str, ...) { return; }
+void liblog_none(const char* str, ...) { if(0 && str) ((void)0); return; }
 
 /* Print 'ASSERT FAILED: main(), cgi.c:11' and exits */
 void liblog_assert(const char* file, int line, const char* func, const char *expr_str)
