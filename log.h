@@ -55,6 +55,7 @@ void liblog_done();
 		liblog_print(((const char*) liblog_get_debug_prefix("WARNING:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);\
 		liblog_print("", "\n\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");};
 #define ERR(str, ...)			(liblog_print(((const char*) liblog_get_debug_prefix("ERROR:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__));
+#define LOG_HEXDUMP(str, data, size) (liblog_hexdump(str, data, size))
 
 
 #define RESET "\e[0m"
@@ -104,5 +105,6 @@ void liblog_done();
 #define DBG(str, ...)			((void) (0))
 #define WARN(str, ...)			((void) (0))
 #define ERR(str, ...)			((void) (0))
+#define LOG_HEXDUMP(str, data, size) ((void) (0))
 #endif
 

@@ -207,7 +207,78 @@ void liblog_fleave_args(const char* file, int line, const char* func, const char
 	debug_indent--; 
 };
 
+char* liblog_get_hexdump(unsigned char *data, int bytes)
+{
+	int buf_size = 16*1024;
+	char *buffer = malloc(buf_size);
+	char *pcur = buffer;
+	char *end = buffer+buf_size;
+	char *color = NULL;
+	int i, j;
+	unsigned char c;
+
+	ASSERT(buffer);
+
+	for (i = 0; i < bytes; i++) {
+		if (!(i % 8) && i)
+			pcur += snprintf(pcur, end-pcur, " ");
+		if (!(i % 16) && i) {
+			pcur += snprintf(pcur, end-pcur, "  ");
+			for (j = 0; j < 16; j++) {
+				c = data[i+j-16];
+				if (c < 0x20) 
+					pcur += snprintf(pcur, end-pcur, B_BLUE"."RESET);
+				else if ( c >= 0x7f )
+					pcur += snprintf(pcur, end-pcur, B_RED"."RESET);
+				else
+					pcur += snprintf(pcur, end-pcur, "%c", c);
+			}
+			pcur += snprintf(pcur, end-pcur, "\n");
+		}
+		if ( data[i] < 0x20 )
+			color = B_BLUE;
+		else if ( data[i] >= 0x7f )
+			color = B_RED;
+		else
+			color = "";
+
+		pcur += snprintf(pcur, end-pcur, "%s%.2x%s ", color, data[i], RESET);
+	}
+	j = (bytes % 16);
+	j = (j != 0 ? j : 16);
+	for (i = j; i < 16; i++) {
+		if (!(i % 8) && i)
+			pcur += snprintf(pcur, end-pcur, " ");
+		pcur += snprintf(pcur, end-pcur, "   ");
+	}
+	printf("   ");
+	for (i = bytes - j; i < bytes; i++) {
+		c = data[i];
+		if ((c < 0x20) || (c >= 0x7f))
+			c = '.';
+		pcur += snprintf(pcur, end-pcur, ORANGE"%c"RESET, c);
+	}
+	pcur += snprintf(pcur, end-pcur, "\n");
+	return buffer;
+}
+
+
+void liblog_hexdump(const char* str, unsigned char *data, int bytes) 
+{
+	char * hexdump = liblog_get_hexdump(data, bytes);
+	ASSERT(hexdump);
+	liblog_print("HEXDUMP", "\n"ORANGE"----------- START HEXDUMP %s %d bytes ----------- "RESET"\n%s"ORANGE"===========  END  HEXDUMP %s %d bytes ==========="RESET, str, bytes, hexdump, str, bytes);
+	free(hexdump);
+}
+
+
 #else
 void liblog_none(const char* str, ...) { return; }
 
 #endif
+
+
+
+
+
+
