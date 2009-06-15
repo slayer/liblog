@@ -33,7 +33,6 @@
 
 #include "log.h"
 
-
 #ifdef LIBLOG_ENABLED
 
 #define _CRT_SECURE_NO_DEPRECATE 1
@@ -121,12 +120,12 @@ void liblog_print(const char* prefix, const char* str, ...)
 
 	time(&t);
 	t1=localtime(&t);
-	cur += SNPRINTF(cur, sizeof(debug_buf), "%04d%02d%02d %02d:%02d:%02d ", 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
+	cur += SNPRINTF(cur, sizeof(debug_buf), BOLD"%04d%02d%02d %02d:%02d:%02d ", 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
                     ,t1->tm_hour,t1->tm_min,t1->tm_sec);
 #ifdef _WIN32
 	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "[%04d:%04d]", GetCurrentProcessId(), GetCurrentThreadId());
 #else
-	cur += sprintf(cur, "[%d]", getpid());
+	cur += sprintf(cur, "[%d]"RESET, getpid());
 #endif
 
    	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "%s%s ", liblog_get_indent(), prefix);
