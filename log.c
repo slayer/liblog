@@ -207,9 +207,28 @@ void liblog_fleave_args(const char* file, int line, const char* func, const char
 	debug_indent--; 
 };
 
+inline int is_printable(unsigned char c)
+{
+	if (c < 0x20 || c >= 0x7f )
+		return 0;
+	else 
+		return 1;
+}
+
+inline char* hexbincolor(unsigned char c)
+{
+	if (c < 0x20) 
+		return BLUE;
+	else if ( c >= 0x7f )
+		return RED;
+	else
+		return "";
+}
+
+
 char* liblog_get_hexdump(unsigned char *data, int bytes)
 {
-	int buf_size = 16*1024;
+	int buf_size = 64*1024;
 	char *buffer = malloc(buf_size);
 	char *pcur = buffer;
 	char *end = buffer+buf_size;
@@ -226,21 +245,11 @@ char* liblog_get_hexdump(unsigned char *data, int bytes)
 			pcur += snprintf(pcur, end-pcur, "  ");
 			for (j = 0; j < 16; j++) {
 				c = data[i+j-16];
-				if (c < 0x20) 
-					pcur += snprintf(pcur, end-pcur, B_BLUE"."RESET);
-				else if ( c >= 0x7f )
-					pcur += snprintf(pcur, end-pcur, B_RED"."RESET);
-				else
-					pcur += snprintf(pcur, end-pcur, "%c", c);
+				pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(c), is_printable(c)? c : '.', RESET);
 			}
 			pcur += snprintf(pcur, end-pcur, "\n");
 		}
-		if ( data[i] < 0x20 )
-			color = B_BLUE;
-		else if ( data[i] >= 0x7f )
-			color = B_RED;
-		else
-			color = "";
+		color = hexbincolor(data[i]);
 
 		pcur += snprintf(pcur, end-pcur, "%s%.2x%s ", color, data[i], RESET);
 	}
@@ -256,7 +265,7 @@ char* liblog_get_hexdump(unsigned char *data, int bytes)
 		c = data[i];
 		if ((c < 0x20) || (c >= 0x7f))
 			c = '.';
-		pcur += snprintf(pcur, end-pcur, ORANGE"%c"RESET, c);
+		pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(c), c, RESET);
 	}
 	pcur += snprintf(pcur, end-pcur, "\n");
 	return buffer;
