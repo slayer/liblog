@@ -15,6 +15,10 @@
  * =====================================================================================
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _WIN32
 #include "stdafx.h"
 #define SNPRINTF _snprintf
@@ -47,6 +51,7 @@ char debug_prefix_buf[1024];
 int  debug_indent=0;
 char debug_indent_buf[1024];
 FILE *log_file = NULL;
+int log_level = 3;
 
 void liblog_init(const char *filename)
 {
@@ -63,6 +68,28 @@ void liblog_init(const char *filename)
 			fprintf(stderr, "failed to open '%s'\n", filename);
 	} else 
 		liblog_set_file(stderr);
+
+	if ( getenv("LOG") ) {
+		char *strlevel = getenv("LOG");
+		if ( atoi(strlevel) == LOG_LEVEL_DBG || (!strncasecmp(strlevel, "D", 1)))
+			liblog_set_level(LOG_LEVEL_DBG);
+		else if ( atoi(strlevel) == LOG_LEVEL_INFO || (!strncasecmp(strlevel, "I", 1)))
+			liblog_set_level(LOG_LEVEL_INFO);
+		else if ( atoi(strlevel) == LOG_LEVEL_WARN || (!strncasecmp(strlevel, "W", 1)))
+			liblog_set_level(LOG_LEVEL_WARN);
+		else if ( atoi(strlevel) == LOG_LEVEL_ERR || (!strncasecmp(strlevel, "E", 1)))
+			liblog_set_level(LOG_LEVEL_ERR);
+		else 
+			WARN("unknown LOG value: '%s', use D,I,W,E or 4,3,2,1", strlevel);
+	}
+}
+
+int liblog_get_level() { return log_level; }
+int liblog_set_level(value) 
+{ 
+	int prev = log_level;
+	log_level = value;
+	return prev; 
 }
 
 void liblog_set_file(FILE* file)
@@ -289,5 +316,8 @@ void liblog_none(const char* str, ...) { if(0 && str) return; }
 
 
 
+#ifdef __cplusplus
+}
+#endif
 
 

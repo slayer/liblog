@@ -15,9 +15,15 @@
  * =====================================================================================
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef LIBLOG_ENABLED
+#define LIBLOG_COLORS
 
 #include <errno.h>
+#include "log_colors.h"
 
 void liblog_init(const char *filename);
 void liblog_print(const char* prefix, const char* str, ...);
@@ -33,9 +39,15 @@ void liblog_fenter_args(const char* file, int line, const char* func, const char
 void liblog_fleave_args(const char* file, int line, const char* func, const char* fmt, ...);
 void liblog_set_file(FILE*f);
 void liblog_first_line();
+int  liblog_get_level();
+int  liblog_set_level(int);
 void liblog_hexdump(const char* str, unsigned char *data, int bytes);
 void liblog_done();
 
+#define LOG_LEVEL_DBG    4
+#define LOG_LEVEL_INFO   3
+#define LOG_LEVEL_WARN   2
+#define LOG_LEVEL_ERR    1
 
 #define LOG_INIT(filename)		(liblog_init(filename))
 #define LOG_SET_FILE(f)			(liblog_set_file(f))
@@ -51,41 +63,15 @@ void liblog_done();
 #define FENTERA(fmt, ...)		(liblog_fenter_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));
 #define FLEAVE					(liblog_fleave(__FILE__, __LINE__, __FUNCTION__));
 #define FLEAVEA(fmt, ...)		(liblog_fleave_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));
-#define DBG(str, ...)			(liblog_print(((const char*) liblog_get_debug_prefix("| DEBUG:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__));
-#define WARN(str, ...)			{ liblog_print("", "\n\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");\
-		liblog_print(((const char*) liblog_get_debug_prefix("WARNING:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);\
-		liblog_print("", "\n\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");};
-#define ERR(str, ...)			(liblog_print(((const char*) liblog_get_debug_prefix("ERROR:", __FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__));
+#define DBG(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_DBG )  { liblog_print(((const char*) liblog_get_debug_prefix(  BLUE"| DEBUG:"RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define INFO(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_INFO ) { liblog_print(((const char*) liblog_get_debug_prefix( GREEN"| INFO:"RESET,		__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define WARN(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_WARN ) { liblog_print(((const char*) liblog_get_debug_prefix(YELLOW"| WARNING:"RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define ERR(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_ERR )  { liblog_print(((const char*) liblog_get_debug_prefix(   RED"| ERROR:"RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
 #define LOG_HEXDUMP(str, data, size) (liblog_hexdump(str, data, size))
+#define LOG_GET_LEVEL			(liblog_get_level())
+#define LOG_SET_LEVEL(level)	(liblog_set_level(level))
 
 
-#define RESET "\e[0m"
-#define BOLD "\e[1m"
-#define FLASH "\e[5m"
-#define BLACK "\e[30m"
-#define RED "\e[31m"
-#define GREEN "\e[32m"
-#define ORANGE "\e[33m"
-#define YELLOW BOLD ORANGE
-#define BLUE "\e[34m"
-#define CYAN "\e[36m"
-#define MAGENTA "\e[35m"
-#define WHITE "\e[37m"
-#define B_RED "\e[41m"
-#define B_GREEN "\e[42m"
-#define B_ORANGE "\e[43m"
-#define B_YELLOW BOLD B_ORANGE
-#define B_BLUE "\e[44m"
-#define B_CYAN "\e[46m"
-#define B_BLACK "\e[40m"
-#define B_WHITE "\e[47m"
-#define CLEARLINE "\e[L\e[G"
-#define B_MAGENTA "\e[45m"
-#define INITTERM "\e[H\e[2J"
-#define ENDTERM ""
-#define SAVE "\e7"
-#define RESTORE "\e8"
-#define HOME "\e[H"
 
 #else
 
@@ -105,8 +91,14 @@ void liblog_none(const char* str, ...);
 #define FLEAVE					((void)	(0))
 #define FLEAVEA(fmt, ...)		((void)	(0))
 #define DBG(str, ...)			((void) (0))
+#define INFO(str, ...)			((void) (0))
 #define WARN(str, ...)			((void) (0))
 #define ERR(str, ...)			((void) (0))
 #define LOG_HEXDUMP(str, data, size) ((void) (0))
+#define LOG_GET_LEVEL			((void) (0))
+#define LOG_SET_LEVEL(level)	((void) (0))
 #endif
 
+#ifdef __cplusplus
+}
+#endif
