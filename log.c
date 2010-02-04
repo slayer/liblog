@@ -7,7 +7,7 @@
  *
  *        Version:  1.0
  *        Created:  13.09.2007 16:37:34 EEST
- *       Revision:  $Id: log.c 710 2008-07-31 21:32:55Z vlad $
+ *       Revision:  $Id:$
  *       Compiler:  gcc
  *
  *         Author:  Vladislav Moskovets, mail: devvlad dot gmail dot com
@@ -126,7 +126,7 @@ void liblog_first_line()
 {
 	static int first=1;
 	if (first) {
-		liblog_puts("Started log: $LastChangedRevision: 710 $, $LastChangedBy: vlad $, $LastChangedDate: 2008-08-01 00:32:55 +0300 (Птн, 01 Авг 2008) $\n");
+        liblog_print(ORANGE"INIT"RESET, "Started log");
 		first=0;
 	}
 }
@@ -150,7 +150,7 @@ void liblog_print(const char* prefix, const char* str, ...)
 	cur += SNPRINTF(cur, sizeof(debug_buf), BOLD"%04d%02d%02d %02d:%02d:%02d ", 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
                     ,t1->tm_hour,t1->tm_min,t1->tm_sec);
 #ifdef _WIN32
-	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "[%04d:%04d]", GetCurrentProcessId(), GetCurrentThreadId());
+	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "[%04d:%04d]"RESET, GetCurrentProcessId(), GetCurrentThreadId());
 #else
 	cur += sprintf(cur, "[%d]"RESET, getpid());
 #endif
