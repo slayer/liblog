@@ -126,7 +126,7 @@ void liblog_first_line()
 {
 	static int first=1;
 	if (first) {
-        liblog_print(ORANGE"INIT"RESET, "Started log");
+        liblog_puts(ORANGE"INIT"RESET":   Started log\n");
 		first=0;
 	}
 }
@@ -141,6 +141,7 @@ void liblog_print(const char* prefix, const char* str, ...)
 	time_t t;
 	struct tm *t1;
 
+    // primitive multi-thread lock support
 	while ( sem ) { usleep(1000); if ( (c % 1000*5) == 0) liblog_puts("semaphore timed out\n"); c++; };
 	sem=1;
 	liblog_first_line();
