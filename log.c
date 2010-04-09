@@ -85,7 +85,7 @@ void liblog_init(const char *filename)
 }
 
 int liblog_get_level() { return log_level; }
-int liblog_set_level(value) 
+int liblog_set_level(int value) 
 { 
 	int prev = log_level;
 	log_level = value;
@@ -254,48 +254,62 @@ inline char* hexbincolor(unsigned char c)
 }
 
 
+int liblog_sprint_hex(char *buf, int buf_size, unsigned char *data, int count)
+{
+    int i;
+    char *color = NULL;
+    char *pcur = buf;
+    char *end = buf + buf_size;
+    for (i = 0; i < count; i++) {
+        if (!(i%8) && i)
+            pcur += snprintf(pcur, end-pcur, " ");
+		color = hexbincolor(data[i]);
+		pcur += snprintf(pcur, end-pcur, "%s%.2x%s ", color, data[i], RESET);
+    }
+    // return count of printed chars
+    return pcur - buf;
+}
+
+int liblog_sprint_ascii(char *buf, int buf_size, unsigned char *data, int count)
+{
+    int i;
+    char *pcur = buf;
+    char *end = buf + buf_size;
+    char c;
+    for (i = 0; i < count; i++) {
+        c = is_printable(data[i])? data[i] : '.';
+        pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(data[i]), c, RESET);
+    }
+    // return count of printed chars
+    return pcur - buf;
+}
+
 char* liblog_get_hexdump(unsigned char *data, int bytes)
 {
 	int buf_size = 64*1024;
 	char *buffer = malloc(buf_size);
 	char *pcur = buffer;
 	char *end = buffer+buf_size;
-	char *color = NULL;
-	int i, j;
-	unsigned char c;
+	unsigned int i;
 
 	ASSERT(buffer);
 
-	for (i = 0; i < bytes; i++) {
-		if (!(i % 8) && i)
-			pcur += snprintf(pcur, end-pcur, " ");
-		if (!(i % 16) && i) {
-			pcur += snprintf(pcur, end-pcur, "  ");
-			for (j = 0; j < 16; j++) {
-				c = data[i+j-16];
-				pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(c), is_printable(c)? c : '.', RESET);
-			}
-			pcur += snprintf(pcur, end-pcur, "\n");
-		}
-		color = hexbincolor(data[i]);
+    // print labels
+    unsigned char labels[LOG_HEXDUMP_STEP];
+    for (i=0; i < LOG_HEXDUMP_STEP; i++)
+        labels[i] = i;
+    pcur += snprintf(pcur, end-pcur, "       ");
+    pcur += liblog_sprint_hex(pcur, end-pcur, labels, LOG_HEXDUMP_STEP);
+    pcur += snprintf(pcur, end-pcur, "\n");
 
-		pcur += snprintf(pcur, end-pcur, "%s%.2x%s ", color, data[i], RESET);
-	}
-	j = (bytes % 16);
-	j = (j != 0 ? j : 16);
-	for (i = j; i < 16; i++) {
-		if (!(i % 8) && i)
-			pcur += snprintf(pcur, end-pcur, " ");
-		pcur += snprintf(pcur, end-pcur, "   ");
-	}
-	printf("   ");
-	for (i = bytes - j; i < bytes; i++) {
-		c = data[i];
-		if ((c < 0x20) || (c >= 0x7f))
-			c = '.';
-		pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(c), c, RESET);
-	}
-	pcur += snprintf(pcur, end-pcur, "\n");
+    for (i=0; i < (unsigned int) bytes; i += LOG_HEXDUMP_STEP, data += LOG_HEXDUMP_STEP) {
+        pcur += snprintf(pcur, end-pcur, "%.6x ", i);
+        pcur += liblog_sprint_hex(pcur, end-pcur, data, LOG_HEXDUMP_STEP);
+        pcur += snprintf(pcur, end-pcur, "  ");
+        pcur += liblog_sprint_ascii(pcur, end-pcur, data, LOG_HEXDUMP_STEP);
+        pcur += snprintf(pcur, end-pcur, "\n");
+    }
+
 	return buffer;
 }
 

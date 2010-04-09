@@ -44,10 +44,11 @@ int  liblog_set_level(int);
 void liblog_hexdump(const char* str, unsigned char *data, int bytes);
 void liblog_done();
 
-#define LOG_LEVEL_DBG    4
-#define LOG_LEVEL_INFO   3
-#define LOG_LEVEL_WARN   2
-#define LOG_LEVEL_ERR    1
+#define LOG_LEVEL_DBG       4
+#define LOG_LEVEL_INFO      3
+#define LOG_LEVEL_WARN      2
+#define LOG_LEVEL_ERR       1
+#define LOG_HEXDUMP_STEP    32
 
 #define LOG_INIT(filename)		(liblog_init(filename))
 #define LOG_SET_FILE(f)			(liblog_set_file(f))
