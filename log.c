@@ -308,17 +308,19 @@ char* liblog_get_hexdump(unsigned char *data, int bytes)
 
     // print labels
     unsigned char labels[LOG_HEXDUMP_STEP];
-    for (i=0; i < LOG_HEXDUMP_STEP; i++)
+    for (i = 0; i < LOG_HEXDUMP_STEP; i++)
         labels[i] = i;
     pcur += snprintf(pcur, end-pcur, "       ");
     pcur += liblog_sprint_hex(pcur, end-pcur, labels, LOG_HEXDUMP_STEP);
     pcur += snprintf(pcur, end-pcur, "\n");
 
-    for (i=0; i < (unsigned int) bytes; i += LOG_HEXDUMP_STEP, data += LOG_HEXDUMP_STEP) {
+    for (i = 0; i < (unsigned int) bytes; i += LOG_HEXDUMP_STEP, data += LOG_HEXDUMP_STEP) {
+        // how many chars need to print?
+        unsigned int step = (i + LOG_HEXDUMP_STEP < (unsigned int)bytes) ? LOG_HEXDUMP_STEP : bytes % LOG_HEXDUMP_STEP;
         pcur += snprintf(pcur, end-pcur, ANSI_DGREEN"%.6x "ANSI_RESET, i);
-        pcur += liblog_sprint_hex(pcur, end-pcur, data, LOG_HEXDUMP_STEP);
+        pcur += liblog_sprint_hex(pcur, end-pcur, data, step);
         pcur += snprintf(pcur, end-pcur, "  ");
-        pcur += liblog_sprint_ascii(pcur, end-pcur, data, LOG_HEXDUMP_STEP);
+        pcur += liblog_sprint_ascii(pcur, end-pcur, data, step);
         pcur += snprintf(pcur, end-pcur, "\n");
     }
 
