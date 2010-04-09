@@ -131,6 +131,7 @@ void liblog_first_line()
 	}
 }
 
+
 /* Combine together prefix, format string and params */
 void liblog_print(const char* prefix, const char* str, ...) 
 {
@@ -148,12 +149,19 @@ void liblog_print(const char* prefix, const char* str, ...)
 
 	time(&t);
 	t1=localtime(&t);
-	cur += SNPRINTF(cur, sizeof(debug_buf), ANSI_BOLD"%04d%02d%02d %02d:%02d:%02d ", 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
+	cur += SNPRINTF(cur, sizeof(debug_buf), ANSI_BOLD"%04d%02d%02d %02d:%02d:%02d "ANSI_RESET, 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
                     ,t1->tm_hour,t1->tm_min,t1->tm_sec);
 #ifdef _WIN32
 	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "[%04d:%04d]"ANSI_RESET, GetCurrentProcessId(), GetCurrentThreadId());
 #else
-	cur += sprintf(cur, "[%d]"ANSI_RESET, getpid());
+    int pid = getpid();
+#ifdef LIBLOG_PIDCOLORS
+    char *pidcolors[] = {ANSI_DRED, ANSI_DGREEN, ANSI_DGREY, ANSI_DBLUE, ANSI_BOLD, ANSI_PURPLE, ANSI_CYAN, ANSI_GREY, ANSI_GREEN, ANSI_PINK, ANSI_LBLUE, ANSI_YELLOW};
+    char* pid_color = pidcolors[pid%(sizeof(pidcolors)/sizeof(pidcolors[0]))];
+#else
+    char* pid_color = ANSI_BOLD;
+#endif
+	cur += sprintf(cur, "%s[%d]"ANSI_RESET, pid_color, pid);
 #endif
 
    	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "%s%s ", liblog_get_indent(), prefix);

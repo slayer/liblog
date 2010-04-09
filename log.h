@@ -21,6 +21,7 @@ extern "C" {
 
 #ifdef LIBLOG_ENABLED
 #define LIBLOG_COLORS
+//#define LIBLOG_PIDCOLORS
 
 #include <errno.h>
 #include "log_colors.h"
