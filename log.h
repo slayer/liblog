@@ -48,7 +48,7 @@ void liblog_done();
 #define LOG_LEVEL_INFO      3
 #define LOG_LEVEL_WARN      2
 #define LOG_LEVEL_ERR       1
-#define LOG_HEXDUMP_STEP    32
+#define LOG_HEXDUMP_STEP    40
 
 #define LOG_INIT(filename)		(liblog_init(filename))
 #define LOG_SET_FILE(f)			(liblog_set_file(f))
@@ -64,10 +64,10 @@ void liblog_done();
 #define FENTERA(fmt, ...)		(liblog_fenter_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));
 #define FLEAVE					(liblog_fleave(__FILE__, __LINE__, __FUNCTION__));
 #define FLEAVEA(fmt, ...)		(liblog_fleave_args(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__));
-#define DBG(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_DBG )  { liblog_print(((const char*) liblog_get_debug_prefix(  BLUE"| DEBUG:"RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
-#define INFO(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_INFO ) { liblog_print(((const char*) liblog_get_debug_prefix( GREEN"| INFO:"RESET,		__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
-#define WARN(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_WARN ) { liblog_print(((const char*) liblog_get_debug_prefix(YELLOW"| WARNING:"RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
-#define ERR(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_ERR )  { liblog_print(((const char*) liblog_get_debug_prefix(   RED"| ERROR:"RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define DBG(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_DBG )  { liblog_print(((const char*) liblog_get_debug_prefix(  ANSI_BLUE"| DEBUG:"ANSI_RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define INFO(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_INFO ) { liblog_print(((const char*) liblog_get_debug_prefix( ANSI_GREEN"| INFO:"ANSI_RESET,		__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define WARN(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_WARN ) { liblog_print(((const char*) liblog_get_debug_prefix(ANSI_YELLOW"| WARNING:"ANSI_RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
+#define ERR(str, ...)			{ if( LOG_GET_LEVEL >= LOG_LEVEL_ERR )  { liblog_print(((const char*) liblog_get_debug_prefix(   ANSI_RED"| ERROR:"ANSI_RESET,	__FILE__, __LINE__, __FUNCTION__)), str, __VA_ARGS__);}; };
 #define LOG_HEXDUMP(str, data, size) (liblog_hexdump(str, data, size))
 #define LOG_GET_LEVEL			(liblog_get_level())
 #define LOG_SET_LEVEL(level)	(liblog_set_level(level))

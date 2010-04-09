@@ -126,7 +126,7 @@ void liblog_first_line()
 {
 	static int first=1;
 	if (first) {
-        liblog_puts(ORANGE"INIT"RESET":   Started log\n");
+        liblog_puts(ANSI_ORANGE"INIT"ANSI_RESET":   Started log\n");
 		first=0;
 	}
 }
@@ -148,12 +148,12 @@ void liblog_print(const char* prefix, const char* str, ...)
 
 	time(&t);
 	t1=localtime(&t);
-	cur += SNPRINTF(cur, sizeof(debug_buf), BOLD"%04d%02d%02d %02d:%02d:%02d ", 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
+	cur += SNPRINTF(cur, sizeof(debug_buf), ANSI_BOLD"%04d%02d%02d %02d:%02d:%02d ", 1900 + t1->tm_year,t1->tm_mon+1,t1->tm_mday
                     ,t1->tm_hour,t1->tm_min,t1->tm_sec);
 #ifdef _WIN32
-	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "[%04d:%04d]"RESET, GetCurrentProcessId(), GetCurrentThreadId());
+	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "[%04d:%04d]"ANSI_RESET, GetCurrentProcessId(), GetCurrentThreadId());
 #else
-	cur += sprintf(cur, "[%d]"RESET, getpid());
+	cur += sprintf(cur, "[%d]"ANSI_RESET, getpid());
 #endif
 
    	cur += SNPRINTF(cur, sizeof(debug_buf) - strlen(debug_buf) - 2, "%s%s ", liblog_get_indent(), prefix);
@@ -245,10 +245,14 @@ inline int is_printable(unsigned char c)
 
 inline char* hexbincolor(unsigned char c)
 {
-	if (c < 0x20) 
-		return BLUE;
+    if (c == 0)
+        return ANSI_DGREY;
+    else if (c == '\n' || c == '\r') 
+		return ANSI_DRED;
+    else if (c < 0x20) 
+		return ANSI_BLUE;
 	else if ( c >= 0x7f )
-		return RED;
+		return ANSI_RED;
 	else
 		return "";
 }
@@ -264,7 +268,7 @@ int liblog_sprint_hex(char *buf, int buf_size, unsigned char *data, int count)
         if (!(i%8) && i)
             pcur += snprintf(pcur, end-pcur, " ");
 		color = hexbincolor(data[i]);
-		pcur += snprintf(pcur, end-pcur, "%s%.2x%s ", color, data[i], RESET);
+		pcur += snprintf(pcur, end-pcur, "%s%.2x%s ", color, data[i], ANSI_RESET);
     }
     // return count of printed chars
     return pcur - buf;
@@ -278,7 +282,7 @@ int liblog_sprint_ascii(char *buf, int buf_size, unsigned char *data, int count)
     char c;
     for (i = 0; i < count; i++) {
         c = is_printable(data[i])? data[i] : '.';
-        pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(data[i]), c, RESET);
+        pcur += snprintf(pcur, end-pcur, "%s%c%s", hexbincolor(data[i]), c, ANSI_RESET);
     }
     // return count of printed chars
     return pcur - buf;
@@ -303,7 +307,7 @@ char* liblog_get_hexdump(unsigned char *data, int bytes)
     pcur += snprintf(pcur, end-pcur, "\n");
 
     for (i=0; i < (unsigned int) bytes; i += LOG_HEXDUMP_STEP, data += LOG_HEXDUMP_STEP) {
-        pcur += snprintf(pcur, end-pcur, "%.6x ", i);
+        pcur += snprintf(pcur, end-pcur, ANSI_DGREEN"%.6x "ANSI_RESET, i);
         pcur += liblog_sprint_hex(pcur, end-pcur, data, LOG_HEXDUMP_STEP);
         pcur += snprintf(pcur, end-pcur, "  ");
         pcur += liblog_sprint_ascii(pcur, end-pcur, data, LOG_HEXDUMP_STEP);
@@ -318,7 +322,7 @@ void liblog_hexdump(const char* str, unsigned char *data, int bytes)
 {
 	char * hexdump = liblog_get_hexdump(data, bytes);
 	ASSERT(hexdump);
-	liblog_print("HEXDUMP", "\n"ORANGE"----------- START HEXDUMP %s %d bytes ----------- "RESET"\n%s"ORANGE"===========  END  HEXDUMP %s %d bytes ==========="RESET, str, bytes, hexdump, str, bytes);
+	liblog_print("HEXDUMP", "\n"ANSI_ORANGE"----------- START HEXDUMP %s %d bytes ----------- "ANSI_RESET"\n%s"ANSI_ORANGE"===========  END  HEXDUMP %s %d bytes ==========="ANSI_RESET, str, bytes, hexdump, str, bytes);
 	free(hexdump);
 }
 
