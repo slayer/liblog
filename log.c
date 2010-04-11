@@ -298,10 +298,10 @@ int liblog_sprint_ascii(char *buf, int buf_size, unsigned char *data, int count)
 
 char* liblog_get_hexdump(unsigned char *data, int bytes)
 {
-	int buf_size = 64*1024;
+	int buf_size = 256*1024;
 	char *buffer = malloc(buf_size);
 	char *pcur = buffer;
-	char *end = buffer+buf_size;
+	char *end = buffer+buf_size-4;
 	unsigned int i;
 
 	ASSERT(buffer);
@@ -317,11 +317,11 @@ char* liblog_get_hexdump(unsigned char *data, int bytes)
     for (i = 0; i < (unsigned int) bytes; i += LOG_HEXDUMP_STEP, data += LOG_HEXDUMP_STEP) {
         // how many chars need to print?
         unsigned int step = (i + LOG_HEXDUMP_STEP < (unsigned int)bytes) ? LOG_HEXDUMP_STEP : bytes % LOG_HEXDUMP_STEP;
-        pcur += snprintf(pcur, end-pcur, ANSI_DGREEN"%.6x "ANSI_RESET, i);
-        pcur += liblog_sprint_hex(pcur, end-pcur, data, step);
-        pcur += snprintf(pcur, end-pcur, "  ");
-        pcur += liblog_sprint_ascii(pcur, end-pcur, data, step);
-        pcur += snprintf(pcur, end-pcur, "\n");
+        pcur += snprintf(pcur, end-pcur-1, ANSI_DGREEN"%.6x "ANSI_RESET, i);
+        pcur += liblog_sprint_hex(pcur, end-pcur-1, data, step);
+        pcur += snprintf(pcur, end-pcur-1, "  ");
+        pcur += liblog_sprint_ascii(pcur, end-pcur-1, data, step);
+        pcur += snprintf(pcur, end-pcur-1, "\n");
     }
 
 	return buffer;
